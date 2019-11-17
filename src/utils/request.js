@@ -4,7 +4,7 @@
  * @Github: https://github.com/fodelf
  * @Date: 2019-08-14 19:09:48
  * @LastEditors: 吴文周
- * @LastEditTime: 2019-11-17 13:54:33
+ * @LastEditTime: 2019-11-17 13:54:59
  */
 import axios from 'axios'
 import { Message } from 'element-ui'
@@ -53,7 +53,7 @@ axios.interceptors.response.use(
    * You can also judge the status by HTTP Status Code
    */
   response => {
-    const res = response.data
+    // const res = response.data
     // console.log('data')
     // console.log(res)
     // if the custom code is not 000000, it is judged as an error.
