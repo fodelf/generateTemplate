@@ -4,8 +4,9 @@
  * @Github: https://github.com/fodelf
  * @Date: 2019-06-04 17:39:53
  * @LastEditors: 吴文周
- * @LastEditTime: 2019-11-14 22:53:24
+ * @LastEditTime: 2019-11-17 12:13:02
  */
+import API from './sever/api'
 const webpack = require('webpack')
 const path = require('path')
 const AddAssetHtmlPlugin = require('add-asset-html-webpack-plugin')
@@ -76,28 +77,25 @@ module.exports = {
       warnings: false,
       errors: true
     },
-    proxy: {
-      '/*': {
-        target: 'http://112.4.154.134:2121',
-        // target: 'http://192.168.100.7:91',
-        ws: false
-      }
-    },
+    // proxy: {
+    //   // '/*': {
+    //   //   target: '',
+    //   //   ws: false
+    //   // }
+    // },
     setup (app) {
-      app.get('/cc', function (req, res) {
-        res.send('sss')
-      })
+      API(app)
     }
   },
   css: {
-    loaderOptions: {
-      // 给 sass-loader 传递选项
-      sass: {
-        // @/ 是 src/ 的别名
-        // 所以这里假设你有 `src/variables.scss` 这个文件
-        data: `@import "@/assets/css/compute.scss";`
-      }
-    }
+    // loaderOptions: {
+    // 给 sass-loader 传递选项
+    // sass: {
+    //   // @/ 是 src/ 的别名
+    //   // 所以这里假设你有 `src/variables.scss` 这个文件
+    //   data: `@import "@/assets/css/compute.scss";`
+    // }
+    // }
   },
   configureWebpack: config => {
     // gizp打包资源可以设置为可配置
