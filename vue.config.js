@@ -4,7 +4,7 @@
  * @Github: https://github.com/fodelf
  * @Date: 2019-06-04 17:39:53
  * @LastEditors: 吴文周
- * @LastEditTime: 2019-11-18 08:56:40
+ * @LastEditTime: 2019-11-18 20:18:37
  */
 const API = require('./sever/api')
 const webpack = require('webpack')
@@ -70,14 +70,14 @@ module.exports = {
   productionSourceMap: false,
   devServer: {
     port: '9090',
-    open: true,
-    hot: false,
-    inline: true,
-    disableHostCheck: false,
-    overlay: {
-      warnings: false,
-      errors: true
-    },
+    // open: true,
+    // hot: false,
+    // inline: true,
+    // disableHostCheck: false,
+    // overlay: {
+    //   warnings: false,
+    //   errors: true
+    // },
     // proxy: {
     //   // '/*': {
     //   //   target: '',

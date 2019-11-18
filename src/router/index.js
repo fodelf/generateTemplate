@@ -1,7 +1,15 @@
+/*
+ * @Description: 描述
+ * @Author: 吴文周
+ * @Github: http://gitlab.yzf.net/wuwenzhou
+ * @Date: 2019-11-15 08:37:45
+ * @LastEditors: 吴文周
+ * @LastEditTime: 2019-11-18 20:17:29
+ */
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 // import Home from '../views/Home.vue'
-import Create from '../views/create/Create.vue'
+// import Create from '../views/create/Create.vue'
 
 Vue.use(VueRouter)
 
@@ -9,7 +17,8 @@ const routes = [
   {
     path: '/',
     name: 'Create',
-    component: Create
+    component: () =>
+      import(/* webpackChunkName: "about" */ '../views/create/Create.vue')
   },
   {
     path: '/about',

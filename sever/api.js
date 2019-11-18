@@ -1,3 +1,12 @@
+/*
+ * @Description: 描述
+ * @Author: 吴文周
+ * @Github: http://gitlab.yzf.net/wuwenzhou
+ * @Date: 2019-11-18 08:40:40
+ * @LastEditors: 吴文周
+ * @LastEditTime: 2019-11-18 19:35:55
+ */
+const bodyParser = require('body-parser')
 const folders = require('./folders')
 /**
  * @name: getCatalogue
@@ -21,12 +30,17 @@ function getCatalogue (app) {
  */
 function getList (app) {
   app.post('/api/getCatalogueList', (req, res) => {
-    let currget = folders.list()
-    res.json({ 'data': currget })
+    let base = req.body.path
+    console.log(base)
+    folders.list(base).then((data) => {
+      res.json({ 'data': data })
+    })
   })
 }
 
 function API (app) {
+  app.use(bodyParser.urlencoded({ extended: true }))
+  app.use(bodyParser.json())
   // 解决跨域
   app.all('*', function (req, res, next) {
     res.header('Access-Control-Allow-Origin', '*')

@@ -4,30 +4,58 @@
  * @Github: http://gitlab.yzf.net/wuwenzhou
  * @Date: 2019-11-18 08:40:40
  * @LastEditors: 吴文周
- * @LastEditTime: 2019-11-18 08:54:30
+ * @LastEditTime: 2019-11-18 20:11:31
  -->
 <!--  -->
 <template>
   <div class="">
-    <div>请选择目录{{ catalogue }}</div>
+    <div>请选择目录{{ catalogue.path }}</div>
+    <div>
+      <span
+        v-for="(item, index) in list"
+        :key="index"
+        class="item"
+        @click="queryList(index)"
+        >{{ item }}</span
+      >
+    </div>
+    <div>
+      <div>目录树</div>
+      <el-tree :data="nodeData" node-key="id" lazy :load="loadNode">
+        <span class="custom-tree-node" slot-scope="{ node, data }">
+          <span
+            ><i class="el-icon-folder-opened" v-if="!data.hidden"></i>
+            <i class="el-icon-tickets" v-else></i> {{ node.label }}</span
+          >
+        </span>
+      </el-tree>
+    </div>
   </div>
 </template>
 
 <script>
 // 这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 // 例如：import 《组件名称》 from '《组件路径》';
-import { getCatalogue } from '../../api/api'
+import { getCatalogue, getCatalogueList } from '../../api/api'
 export default {
   // import引入的组件需要注入到对象中才能使用
   components: {},
   data () {
     // 这里存放数据
     return {
-      catalogue: ''
+      catalogue: {
+        path: ''
+      },
+      nodeData: []
     }
   },
   // 监听属性 类似于data概念
-  computed: {},
+  computed: {
+    list: function () {
+      // `this` 指向 vm 实例
+      return this.catalogue.path.split('\\')
+    }
+  },
   // 监控data中的数据变化
   watch: {},
   // 方法集合
@@ -35,8 +63,31 @@ export default {
     getCatalogueAction () {
       getCatalogue().then(res => {
         this.catalogue = res
+        getCatalogueList({ path: res.path }).then(res => {
+          this.nodeData = res
+          console.log(res)
+        })
+      })
+    },
+    queryList (index) {
+      let array = []
+      this.list.forEach((element, i) => {
+        if (i <= index) {
+          array.push(element)
+        }
+      })
+      console.log(array)
+      getCatalogueList({ path: array.join('\\') }).then(res => {
+        this.nodeData = res
+        console.log(res)
       })
     }
+    // loadNode (node, resolve) {
+    //   getCatalogueList({ path: node.data.path }).then(res => {
+    //     // this.nodeData = res
+    //     resolve(res)
+    //   })
+    // }
   },
   // 生命周期 - 创建完成（可以访问当前this实例）
   created () {
@@ -54,5 +105,7 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-//@import url(); 引入公共css类
+.item {
+  border: 1px solid green;
+}
 </style>

@@ -37,6 +37,9 @@ async function list (base, context) {
       return {
         path: folderPath,
         name: file,
+        label: file,
+        id: file,
+        children: [],
         hidden: isHidden(folderPath)
       }
     }
