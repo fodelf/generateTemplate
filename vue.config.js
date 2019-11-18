@@ -4,10 +4,11 @@
  * @Github: https://github.com/fodelf
  * @Date: 2019-06-04 17:39:53
  * @LastEditors: 吴文周
- * @LastEditTime: 2019-11-14 22:53:24
+ * @LastEditTime: 2019-11-15 09:36:20
  */
 const webpack = require('webpack')
 const path = require('path')
+const merge = require('deepmerge')
 const AddAssetHtmlPlugin = require('add-asset-html-webpack-plugin')
 const CompressionWebpackPlugin = require('compression-webpack-plugin')
 const HappyPack = require('happypack')
@@ -96,6 +97,9 @@ module.exports = {
         // @/ 是 src/ 的别名
         // 所以这里假设你有 `src/variables.scss` 这个文件
         data: `@import "@/assets/css/compute.scss";`
+      },
+      stylus: {
+        import: ['~@/style/imports']
       }
     }
   },
@@ -128,6 +132,14 @@ module.exports = {
     }
   },
   chainWebpack (config) {
+    config.module.rule('stylus').oneOf('vue').use('postcss-loader')
+      .tap(options =>
+        merge(options, {
+          config: {
+            path: path.resolve(__dirname, '.postcssrc')
+          }
+        })
+      )
     // 添加别名
     config.resolve.alias
       .set('assets', resolve('src/assets'))

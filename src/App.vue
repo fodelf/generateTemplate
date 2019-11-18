@@ -1,3 +1,11 @@
+<!--
+ * @Description: 描述
+ * @Author: 吴文周
+ * @Github: http://gitlab.yzf.net/wuwenzhou
+ * @Date: 2019-11-15 08:37:45
+ * @LastEditors: 吴文周
+ * @LastEditTime: 2019-11-18 08:39:22
+ -->
 <template>
   <div id="app">
     <div id="nav">
@@ -7,8 +15,7 @@
     <router-view />
   </div>
 </template>
-
-<style lang ='css'>
+<style lang="css">
 #app {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
