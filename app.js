@@ -4,7 +4,7 @@
  * @Github: http://gitlab.yzf.net/wuwenzhou
  * @Date: 2019-11-12 09:11:40
  * @LastEditors: 吴文周
- * @LastEditTime: 2019-11-14 22:23:53
+ * @LastEditTime: 2019-11-17 12:20:35
  * @鸣谢 https://www.cnblogs.com/xiaohaifengke/p/7693185.html
  */
 const fs = require('fs')
@@ -20,14 +20,17 @@ let templateString = fs.readFileSync(
   path.join(__dirname, './Result.java'),
   'utf8'
 )
-//读取js模板
+// 读取js模板
 // let templateString = fs.readFileSync(
 //   path.join(__dirname, './module.js'),
 //   'utf8'
 // )
 var compiled = _.template(templateString)
 let content = compiled({
-  tests: [{ name: 'fred', type: 'String' }, { name: 'sss', type: 'String' }]
+  tests: [
+    { name: 'fred', type: 'String' },
+    { name: 'sss', type: 'String' }
+  ]
 })
 // let content = template.replace(/componentName/g, componentName) // target file content
 

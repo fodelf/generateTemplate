@@ -4,7 +4,7 @@
  * @Github: https://github.com/fodelf
  * @Date: 2019-08-14 19:09:48
  * @LastEditors: 吴文周
- * @LastEditTime: 2019-11-15 08:50:45
+ * @LastEditTime: 2019-11-17 13:54:59
  */
 import axios from 'axios'
 import { Message } from 'element-ui'
@@ -53,35 +53,35 @@ axios.interceptors.response.use(
    * You can also judge the status by HTTP Status Code
    */
   response => {
-    const res = response.data
+    // const res = response.data
     // console.log('data')
     // console.log(res)
     // if the custom code is not 000000, it is judged as an error.
-    if (res.code !== '000000') {
-      Message({
-        message: res.msg || '出错啦！',
-        type: 'error',
-        duration: 5 * 1000,
-        showClose: true
-      })
-      // window.location.href = '/'
-      // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
-      // if (res.code === 50008 || res.code === 50012 || res.code === 50014) {
-      //   // to re-login
-      //   MessageBox.confirm('You have been logged out, you can cancel to stay on this page, or log in again', 'Confirm logout', {
-      //     confirmButtonText: 'Re-Login',
-      //     cancelButtonText: 'Cancel',
-      //     type: 'warning'
-      //   }).then(() => {
-      //     // store.dispatch('user/resetToken').then(() => {
-      //     //   location.reload()
-      //     // })
-      //   })
-      // }
-      return Promise.reject(res.msg || 'error')
-    } else {
-      return res
-    }
+    // if (res.code !== '000000') {
+    //   Message({
+    //     message: res.msg || '出错啦！',
+    //     type: 'error',
+    //     duration: 5 * 1000,
+    //     showClose: true
+    //   })
+    // window.location.href = '/'
+    // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
+    // if (res.code === 50008 || res.code === 50012 || res.code === 50014) {
+    //   // to re-login
+    //   MessageBox.confirm('You have been logged out, you can cancel to stay on this page, or log in again', 'Confirm logout', {
+    //     confirmButtonText: 'Re-Login',
+    //     cancelButtonText: 'Cancel',
+    //     type: 'warning'
+    //   }).then(() => {
+    //     // store.dispatch('user/resetToken').then(() => {
+    //     //   location.reload()
+    //     // })
+    //   })
+    // }
+    //   return Promise.reject(res.msg || 'error')
+    // } else {
+    //   return res
+    // }
   },
   error => {
     // console.log('err' + error) // for debug
