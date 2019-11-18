@@ -1,14 +1,22 @@
+<!--
+ * @Description: 描述
+ * @Author: 吴文周
+ * @Github: http://gitlab.yzf.net/wuwenzhou
+ * @Date: 2019-11-18 08:40:40
+ * @LastEditors: 吴文周
+ * @LastEditTime: 2019-11-18 08:54:30
+ -->
 <!--  -->
 <template>
-  <div class=''>
-    <div> 请选择目录{{catalogue}}</div>
+  <div class="">
+    <div>请选择目录{{ catalogue }}</div>
   </div>
 </template>
 
 <script>
 // 这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 // 例如：import 《组件名称》 from '《组件路径》';
-
+import { getCatalogue } from '../../api/api'
 export default {
   // import引入的组件需要注入到对象中才能使用
   components: {},
@@ -24,25 +32,27 @@ export default {
   watch: {},
   // 方法集合
   methods: {
-
+    getCatalogueAction () {
+      getCatalogue().then(res => {
+        this.catalogue = res
+      })
+    }
   },
   // 生命周期 - 创建完成（可以访问当前this实例）
   created () {
-
+    this.getCatalogueAction()
   },
   // 生命周期 - 挂载完成（可以访问DOM元素）
-  mounted () {
-
-  },
-  beforeCreate () { }, // 生命周期 - 创建之前
-  beforeMount () { }, // 生命周期 - 挂载之前
-  beforeUpdate () { }, // 生命周期 - 更新之前
-  updated () { }, // 生命周期 - 更新之后
-  beforeDestroy () { }, // 生命周期 - 销毁之前
-  destroyed () { }, // 生命周期 - 销毁完成
-  activated () { } // 如果页面有keep-alive缓存功能，这个函数会触发
+  mounted () {},
+  beforeCreate () {}, // 生命周期 - 创建之前
+  beforeMount () {}, // 生命周期 - 挂载之前
+  beforeUpdate () {}, // 生命周期 - 更新之前
+  updated () {}, // 生命周期 - 更新之后
+  beforeDestroy () {}, // 生命周期 - 销毁之前
+  destroyed () {}, // 生命周期 - 销毁完成
+  activated () {} // 如果页面有keep-alive缓存功能，这个函数会触发
 }
 </script>
-<style lang='scss' scoped>
+<style lang="scss" scoped>
 //@import url(); 引入公共css类
 </style>

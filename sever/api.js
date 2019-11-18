@@ -1,4 +1,4 @@
-import folders from './folders'
+const folders = require('./folders')
 /**
  * @name: getCatalogue
  * @description: 获取当前目录
@@ -6,9 +6,11 @@ import folders from './folders'
  * @return {type}: 默认类型
  */
 function getCatalogue (app) {
-  app.post('/api/getCatalogue', function (req, res) {
+  app.post('/api/getCatalogue', (req, res) => {
     let currget = folders.getCurrent()
-    res.send(currget)
+    console.log('ssss')
+    console.log({ 'data': currget })
+    res.json({ 'data': currget })
   })
 }
 /**
@@ -18,13 +20,22 @@ function getCatalogue (app) {
  * @return {type}: 默认类型
  */
 function getList (app) {
-  app.post('/api/getCatalogueList', function (req, res) {
+  app.post('/api/getCatalogueList', (req, res) => {
     let currget = folders.list()
-    res.send(currget)
+    res.json({ 'data': currget })
   })
 }
 
 function API (app) {
+  // 解决跨域
+  app.all('*', function (req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*')
+    res.header('Access-Control-Allow-Headers', 'X-Requested-With')
+    res.header('Access-Control-Allow-Methods', 'PUT,POST,GET,DELETE,OPTIONS')
+    res.header('X-Powered-By', ' 3.2.1')
+    res.header('Content-Type', 'application/json;charset=utf-8')
+    next()
+  })
   getCatalogue(app)
   getList(app)
 }

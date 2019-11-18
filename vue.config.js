@@ -4,9 +4,9 @@
  * @Github: https://github.com/fodelf
  * @Date: 2019-06-04 17:39:53
  * @LastEditors: 吴文周
- * @LastEditTime: 2019-11-18 08:43:16
+ * @LastEditTime: 2019-11-18 08:56:40
  */
-import API from './sever/api'
+const API = require('./sever/api')
 const webpack = require('webpack')
 const path = require('path')
 const merge = require('deepmerge')

@@ -4,13 +4,13 @@
  * @Github: https://github.com/fodelf
  * @Date: 2019-08-14 19:09:48
  * @LastEditors: 吴文周
- * @LastEditTime: 2019-11-17 13:54:59
+ * @LastEditTime: 2019-11-18 09:13:19
  */
 import axios from 'axios'
 import { Message } from 'element-ui'
 // import { MessageBox, Message } from 'element-ui'
 // import store from '@/pages/store/index.js'
-import { getToken } from './auth'
+// import { getToken } from './auth'
 
 // create an axios instance
 axios.create({
@@ -28,9 +28,9 @@ axios.interceptors.request.use(
     // let each request carry token
     // ['X-Token'] is a custom headers key
     // please modify it according to the actual situation
-    config.headers['Authorization'] = getToken()
+    // config.headers['Authorization'] = getToken()
     // }
-    config.headers['Content-Type'] = 'application/json'
+    config.headers['Content-Type'] = 'application/json;charset=utf-8'
     return config
   },
   error => {
@@ -53,7 +53,7 @@ axios.interceptors.response.use(
    * You can also judge the status by HTTP Status Code
    */
   response => {
-    // const res = response.data
+    const res = response.data
     // console.log('data')
     // console.log(res)
     // if the custom code is not 000000, it is judged as an error.
@@ -80,7 +80,7 @@ axios.interceptors.response.use(
     // }
     //   return Promise.reject(res.msg || 'error')
     // } else {
-    //   return res
+    return res
     // }
   },
   error => {
