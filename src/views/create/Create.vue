@@ -4,7 +4,7 @@
  * @Github: http://gitlab.yzf.net/wuwenzhou
  * @Date: 2019-11-18 08:40:40
  * @LastEditors: 吴文周
- * @LastEditTime: 2019-11-19 09:23:08
+ * @LastEditTime: 2019-11-19 19:14:10
  -->
 <!--  -->
 <template>
@@ -15,6 +15,23 @@
             :key="index"
             class="item"
             @click="queryList(index)">{{ item }}</span>
+    </div>
+    <div>
+      <div>上传</div>
+      <el-upload class="upload-demo"
+                 action="/api/upload"
+                 :on-preview="handlePreview"
+                 :on-remove="handleRemove"
+                 :before-remove="beforeRemove"
+                 multiple
+                 :limit="3"
+                 :on-exceed="handleExceed"
+                 :file-list="fileList">
+        <el-button size="small"
+                   type="primary">点击上传</el-button>
+        <div slot="tip"
+             class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+      </el-upload>
     </div>
     <div>
       <div>目录树</div>
