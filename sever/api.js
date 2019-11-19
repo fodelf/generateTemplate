@@ -4,7 +4,7 @@
  * @Github: http://gitlab.yzf.net/wuwenzhou
  * @Date: 2019-11-18 08:40:40
  * @LastEditors: 吴文周
- * @LastEditTime: 2019-11-18 19:35:55
+ * @LastEditTime: 2019-11-19 08:50:26
  */
 const bodyParser = require('body-parser')
 const folders = require('./folders')
@@ -41,15 +41,6 @@ function getList (app) {
 function API (app) {
   app.use(bodyParser.urlencoded({ extended: true }))
   app.use(bodyParser.json())
-  // 解决跨域
-  app.all('*', function (req, res, next) {
-    res.header('Access-Control-Allow-Origin', '*')
-    res.header('Access-Control-Allow-Headers', 'X-Requested-With')
-    res.header('Access-Control-Allow-Methods', 'PUT,POST,GET,DELETE,OPTIONS')
-    res.header('X-Powered-By', ' 3.2.1')
-    res.header('Content-Type', 'application/json;charset=utf-8')
-    next()
-  })
   getCatalogue(app)
   getList(app)
 }

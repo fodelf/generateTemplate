@@ -40,12 +40,30 @@ async function list (base, context) {
         label: file,
         id: file,
         children: [],
-        hidden: isHidden(folderPath)
+        hidden: isHidden(folderPath),
+        isDirectory: isDirectory(folderPath)
       }
     }
   ).filter(
-    file => isDirectory(file.path)
+    file => !file.hidden
+  ).filter(
+    file => file.name !== 'node_modules'
   )
+  // files.map(
+  //   file => {
+  //     const folderPath = path.join(base, file)
+  //     return {
+  //       path: folderPath,
+  //       name: file,
+  //       label: file,
+  //       id: file,
+  //       children: [],
+  //       hidden: isHidden(folderPath)
+  //     }
+  //   }
+  // ).filter(
+  //   file => isDirectory(file.path)
+  // )
 }
 
 function isHidden (file) {

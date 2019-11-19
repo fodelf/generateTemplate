@@ -4,29 +4,31 @@
  * @Github: http://gitlab.yzf.net/wuwenzhou
  * @Date: 2019-11-18 08:40:40
  * @LastEditors: 吴文周
- * @LastEditTime: 2019-11-18 20:11:31
+ * @LastEditTime: 2019-11-19 09:23:08
  -->
 <!--  -->
 <template>
   <div class="">
     <div>请选择目录{{ catalogue.path }}</div>
     <div>
-      <span
-        v-for="(item, index) in list"
-        :key="index"
-        class="item"
-        @click="queryList(index)"
-        >{{ item }}</span
-      >
+      <span v-for="(item, index) in list"
+            :key="index"
+            class="item"
+            @click="queryList(index)">{{ item }}</span>
     </div>
     <div>
       <div>目录树</div>
-      <el-tree :data="nodeData" node-key="id" lazy :load="loadNode">
-        <span class="custom-tree-node" slot-scope="{ node, data }">
-          <span
-            ><i class="el-icon-folder-opened" v-if="!data.hidden"></i>
-            <i class="el-icon-tickets" v-else></i> {{ node.label }}</span
-          >
+      <el-tree :data="nodeData"
+               node-key="id"
+               lazy
+               :load="loadNode"
+               :filter-node-method="filterNode">
+        <span class="custom-tree-node"
+              slot-scope="{ node,data}">
+          <span><i class="el-icon-folder-opened"
+               v-if="data.isDirectory"></i>
+            <i v-else
+               class="el-icon-tickets"></i> {{ node.label }}</span>
         </span>
       </el-tree>
     </div>
@@ -63,9 +65,9 @@ export default {
     getCatalogueAction () {
       getCatalogue().then(res => {
         this.catalogue = res
-        getCatalogueList({ path: res.path }).then(res => {
-          this.nodeData = res
-          console.log(res)
+        getCatalogueList({ path: res.path }).then(back => {
+          this.nodeData = back
+          console.log(back)
         })
       })
     },
@@ -81,27 +83,35 @@ export default {
         this.nodeData = res
         console.log(res)
       })
+    },
+    loadNode (node, resolve) {
+      // var path = node.data.path.split.split('\\')
+      // path = path.join('\\')
+      if (node.level === 0) {
+        resolve([])
+        return
+      }
+      getCatalogueList({ path: node.data.path }).then(res => {
+        resolve(res)
+      })
+    },
+    filterNode (value, data) {
+      return !data.hidden
     }
-    // loadNode (node, resolve) {
-    //   getCatalogueList({ path: node.data.path }).then(res => {
-    //     // this.nodeData = res
-    //     resolve(res)
-    //   })
-    // }
   },
   // 生命周期 - 创建完成（可以访问当前this实例）
   created () {
     this.getCatalogueAction()
   },
   // 生命周期 - 挂载完成（可以访问DOM元素）
-  mounted () {},
-  beforeCreate () {}, // 生命周期 - 创建之前
-  beforeMount () {}, // 生命周期 - 挂载之前
-  beforeUpdate () {}, // 生命周期 - 更新之前
-  updated () {}, // 生命周期 - 更新之后
-  beforeDestroy () {}, // 生命周期 - 销毁之前
-  destroyed () {}, // 生命周期 - 销毁完成
-  activated () {} // 如果页面有keep-alive缓存功能，这个函数会触发
+  mounted () { },
+  beforeCreate () { }, // 生命周期 - 创建之前
+  beforeMount () { }, // 生命周期 - 挂载之前
+  beforeUpdate () { }, // 生命周期 - 更新之前
+  updated () { }, // 生命周期 - 更新之后
+  beforeDestroy () { }, // 生命周期 - 销毁之前
+  destroyed () { }, // 生命周期 - 销毁完成
+  activated () { } // 如果页面有keep-alive缓存功能，这个函数会触发
 }
 </script>
 <style lang="scss" scoped>
