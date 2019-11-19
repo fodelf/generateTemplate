@@ -4,7 +4,7 @@
  * @Github: http://gitlab.yzf.net/wuwenzhou
  * @Date: 2019-11-18 08:40:40
  * @LastEditors: 吴文周
- * @LastEditTime: 2019-11-19 19:59:35
+ * @LastEditTime: 2019-11-19 22:27:21
  */
 const bodyParser = require('body-parser')
 const folders = require('./folders')
@@ -53,9 +53,12 @@ function upload (app) {
   app.post('/api/upload', mutipartMiddeware, function (req, res) {
     const file = req.files.file
     console.log(file)
-    fs.copy(file.path, '/template/aa', function (err) {
-      if (err) return console.error(err)
-      res.json({ 'data': 'sucess' })
+    let name = file.path.split('/').pop()
+    fs.readFile(file.path, function (data) {
+      let outPath = folders.getCurrent().path + '/serve/template/' + name
+      fs.outputFile(outPath, data, function () {
+        res.json({ data: '' })
+      })
     })
   })
 }
