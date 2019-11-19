@@ -4,7 +4,7 @@
  * @Github: http://gitlab.yzf.net/wuwenzhou
  * @Date: 2019-11-18 08:40:40
  * @LastEditors: 吴文周
- * @LastEditTime: 2019-11-19 08:50:26
+ * @LastEditTime: 2019-11-19 12:38:25
  */
 const bodyParser = require('body-parser')
 const folders = require('./folders')
@@ -34,6 +34,8 @@ function getList (app) {
     console.log(base)
     folders.list(base).then((data) => {
       res.json({ 'data': data })
+    }).catch(() => {
+      res.json({ 'data': [] })
     })
   })
 }
