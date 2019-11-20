@@ -4,13 +4,14 @@
  * @Github: http://gitlab.yzf.net/wuwenzhou
  * @Date: 2019-11-18 08:40:40
  * @LastEditors: 吴文周
- * @LastEditTime: 2019-11-19 22:27:21
+ * @LastEditTime: 2019-11-20 19:31:16
  */
 const bodyParser = require('body-parser')
 const folders = require('./folders')
 const fs = require('fs-extra')
 const mutipart = require('connect-multiparty')
 const mutipartMiddeware = mutipart()
+// const isPlatformWindows = process.platform.indexOf('win') === 0
 /**
  * @name: getCatalogue
  * @description: 获取当前目录
@@ -53,9 +54,10 @@ function upload (app) {
   app.post('/api/upload', mutipartMiddeware, function (req, res) {
     const file = req.files.file
     console.log(file)
-    let name = file.path.split('/').pop()
-    fs.readFile(file.path, function (data) {
-      let outPath = folders.getCurrent().path + '/serve/template/' + name
+    fs.readFile(file.path, 'utf8', function (err, data) {
+      console.log(err)
+      let outPath = folders.getCurrent().path + '/server/template/' + file.originalFilename
+      console.log(outPath)
       fs.outputFile(outPath, data, function () {
         res.json({ data: '' })
       })
