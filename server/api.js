@@ -4,7 +4,7 @@
  * @Github: http://gitlab.yzf.net/wuwenzhou
  * @Date: 2019-11-18 08:40:40
  * @LastEditors: 吴文周
- * @LastEditTime: 2019-11-25 11:40:57
+ * @LastEditTime: 2019-11-25 20:33:48
  */
 const bodyParser = require('body-parser')
 const folders = require('./folders')
@@ -71,7 +71,8 @@ function upload (app) {
 function generateTs (app) {
   app.post('/api/generateTs', function (req, res) {
     let swagger = req.body.swagger
-    let outPath = path.join(__dirname, './template/interfaces1.ts')
+    // let outPath = path.join(__dirname, './template/interfaces1.ts')
+    let outPath = req.body.path + '/interfaces.ts'
     // 读取模板文件，并修改内容
     let templateString = fs.readFileSync(
       path.join(__dirname, './template/interfaces.ts'),
@@ -79,19 +80,34 @@ function generateTs (app) {
     )
     let swaggerList = []
     let pathObject = swagger.paths
-    console.log(pathObject)
     for (var k in pathObject) {
       if (pathObject[k].post) {
-        swaggerList.push(pathObject[k].post.parameters)
+        let post = pathObject[k].post
+        let arry = post.parameters
+        if (Array.isArray(arry)) {
+          let child = {}
+          arry.map(item => {
+            if (item.type === 'integer') {
+              item.type = 'Number'
+            } else if (item.type === 'array') {
+              item.type = 'Array'
+            }
+            return item
+          })
+          child['parameters'] = arry
+          child['ClassName'] = post.operationId
+          child['desc'] = post.summary
+          console.log(child)
+          swaggerList.push(child)
+        }
       }
     }
-    console.log(swaggerList)
-
     var compiled = _.template(templateString)
     let content = compiled({
       attrs: swaggerList
     })
     console.log(content)
+    console.log(outPath)
     fs.outputFile(outPath, content, function () {
       res.json({ data: 'cc' })
     })
@@ -100,29 +116,14 @@ function generateTs (app) {
 
 function API (app) {
   app.use(bodyParser.urlencoded({ extended: true }))
-  // app.use(bodyParser.json())
   app.use(bodyParser.json({ 'limit': '5000000kb' }))
   getCatalogue(app)
   getList(app)
   upload(app)
-  // getSwagger(app)
   generateTs(app)
   var options = {
-    // pathRewrite: {'^/static' : ''},
-    target: 'http://172.23.0.187:8186/' // 目标服务器 host
-    // changeOrigin: true, // 默认false，是否需要改变原始主机头为目标URL
-    // ws: true // 是否代理websockets
-    // pathRewrite: {
-    //   '^/api/old-path': '/api/new-path', // 重写请求，比如我们源访问的是api/old-path，那么请求会被解析为/api/new-path
-    //   '^/api/remove/path': '/path' // 同上
-    // },
-    // router: {
-    //   // 如果请求主机 == 'dev.localhost:3000',
-    //   // 重写目标服务器 'http://www.example.org' 为 'http://localhost:8000'
-    //   'dev.localhost:3000': 'http://localhost:8000'
-    // }
+    target: 'http://172.23.0.187:8186/'
   }
-
   var exampleProxy = proxy(options)
   app.use('/v2/api-docs', exampleProxy)
 }

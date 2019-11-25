@@ -48,6 +48,8 @@ async function list (base, context) {
     file => !file.hidden
   ).filter(
     file => file.name !== 'node_modules'
+  ).filter(
+    file => file.isDirectory
   )
   // files.map(
   //   file => {

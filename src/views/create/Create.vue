@@ -4,7 +4,7 @@
  * @Github: http://gitlab.yzf.net/wuwenzhou
  * @Date: 2019-11-18 08:40:40
  * @LastEditors: 吴文周
- * @LastEditTime: 2019-11-25 11:33:38
+ * @LastEditTime: 2019-11-25 19:48:05
  -->
 <!--  -->
 <template>
@@ -43,6 +43,7 @@
       <el-tree :data="nodeData"
                node-key="id"
                lazy
+               ref='tree'
                :load="loadNode"
                :filter-node-method="filterNode">
         <span class="custom-tree-node"
@@ -123,11 +124,23 @@ export default {
       return !data.hidden
     },
     getSwagger () {
+      var path = this.$refs.tree.getCurrentNode() ? this.$refs.tree.getCurrentNode().path : ''
+      if (!path) {
+        this.$message({
+          message: '请选择创建的目录',
+          type: 'warning'
+        })
+        return
+      }
       // var specUrl = 'http://petstore.swagger.io/v2/swagger.json' // data urls are OK too 'data:application/json;base64,abc...'
       // var specUrl = 'http://172.23.0.187:8186/v2/api-docs'
       getSwaggerAction().then((res) => {
-        generateTs({ swagger: res }).then((res1) => {
-          console.log("s's")
+        var path = this.$refs.tree.getCurrentNode() ? this.$refs.tree.getCurrentNode().path : ''
+        generateTs({ swagger: res, path: path }).then((res1) => {
+          this.$message({
+            message: '恭喜你，模板创建成功',
+            type: 'success'
+          })
         })
       })
       // SwaggerClient.http.withCredentials = false // this activates CORS, if necessary
