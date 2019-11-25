@@ -4,7 +4,7 @@
  * @Github: https://github.com/fodelf
  * @Date: 2019-06-06 18:05:02
  * @LastEditors: 吴文周
- * @LastEditTime: 2019-11-18 19:26:52
+ * @LastEditTime: 2019-11-25 10:50:10
  */
 import request from '../utils/request'
 
@@ -19,6 +19,21 @@ export function getCatalogue (params) {
 export function getCatalogueList (params) {
   return request({
     url: '/api/getCatalogueList',
+    method: 'POST',
+    params: params
+  })
+}
+
+export function getSwaggerAction (params) {
+  return request({
+    url: '/v2/api-docs',
+    method: 'GET',
+    params: params
+  })
+}
+export function generateTs (params) {
+  return request({
+    url: '/api/generateTs',
     method: 'POST',
     params: params
   })

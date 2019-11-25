@@ -4,7 +4,7 @@
  * @Github: http://gitlab.yzf.net/wuwenzhou
  * @Date: 2019-11-18 08:40:40
  * @LastEditors: 吴文周
- * @LastEditTime: 2019-11-19 19:14:10
+ * @LastEditTime: 2019-11-25 11:33:38
  -->
 <!--  -->
 <template>
@@ -20,19 +20,24 @@
       <div>上传</div>
       <el-upload class="upload-demo"
                  action="/api/upload"
-                 :on-preview="handlePreview"
-                 :on-remove="handleRemove"
-                 :before-remove="beforeRemove"
                  multiple
                  :limit="3"
                  :on-exceed="handleExceed"
                  :file-list="fileList">
         <el-button size="small"
                    type="primary">点击上传</el-button>
-        <div slot="tip"
-             class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
       </el-upload>
     </div>
+    <div>
+      <h5>获取swagger列表</h5>
+      <el-input v-model="url"></el-input>
+      <el-button type="primary"
+                 @click="getSwagger">
+        点击获取
+      </el-button>
+      <div>{{swagger}}</div>
+    </div>
+
     <div>
       <div>目录树</div>
       <el-tree :data="nodeData"
@@ -55,7 +60,7 @@
 <script>
 // 这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 // 例如：import 《组件名称》 from '《组件路径》';
-import { getCatalogue, getCatalogueList } from '../../api/api'
+import { getCatalogue, getCatalogueList, getSwaggerAction, generateTs } from '../../api/api'
 export default {
   // import引入的组件需要注入到对象中才能使用
   components: {},
@@ -65,7 +70,9 @@ export default {
       catalogue: {
         path: ''
       },
-      nodeData: []
+      nodeData: [],
+      swagger: '',
+      url: ''
     }
   },
   // 监听属性 类似于data概念
@@ -114,6 +121,29 @@ export default {
     },
     filterNode (value, data) {
       return !data.hidden
+    },
+    getSwagger () {
+      // var specUrl = 'http://petstore.swagger.io/v2/swagger.json' // data urls are OK too 'data:application/json;base64,abc...'
+      // var specUrl = 'http://172.23.0.187:8186/v2/api-docs'
+      getSwaggerAction().then((res) => {
+        generateTs({ swagger: res }).then((res1) => {
+          console.log("s's")
+        })
+      })
+      // SwaggerClient.http.withCredentials = false // this activates CORS, if necessary
+
+      // var swaggerClient = new SwaggerClient(specUrl)
+      //   .then(function (swaggerClient) {
+      //     return swaggerClient.apis.pet.addPet({ id: 1, name: 'bobby' }) // chaining promises
+      //   }, function (reason) {
+      //     console.error('failed to load the spec' + reason)
+      //   })
+      //   .then(function (addPetResult) {
+      //     console.log(addPetResult.obj)
+      //     // you may return more promises, if necessary
+      //   }, function (reason) {
+      //     console.error('failed on API call ' + reason)
+      //   })
     }
   },
   // 生命周期 - 创建完成（可以访问当前this实例）

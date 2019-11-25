@@ -4,7 +4,7 @@
  * @Github: https://github.com/fodelf
  * @Date: 2019-08-14 19:09:48
  * @LastEditors: 吴文周
- * @LastEditTime: 2019-11-18 09:13:19
+ * @LastEditTime: 2019-11-25 10:19:08
  */
 import axios from 'axios'
 import { Message } from 'element-ui'
@@ -126,12 +126,9 @@ export default function request (args) {
     default:
       return new Promise((resolve, reject) => {
         axios
-          .get(url, {
-            params: resParams
-          })
+          .get(url)
           .then(res => {
-            let data = res.data ? res.data : {}
-            resolve(data)
+            resolve(res)
           })
           .catch(err => {
             reject(err)
