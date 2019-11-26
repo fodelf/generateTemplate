@@ -4,10 +4,9 @@
  * @Github: https://github.com/fodelf
  * @Date: 2019-06-06 18:05:02
  * @LastEditors: 吴文周
- * @LastEditTime: 2019-11-25 10:50:10
+ * @LastEditTime: 2019-11-26 08:41:19
  */
 import request from '../utils/request'
-
 export function getCatalogue (params) {
   return request({
     url: '/api/getCatalogue',
