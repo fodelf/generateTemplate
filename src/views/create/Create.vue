@@ -4,7 +4,7 @@
  * @Github: http://gitlab.yzf.net/wuwenzhou
  * @Date: 2019-11-18 08:40:40
  * @LastEditors: 吴文周
- * @LastEditTime: 2019-11-26 16:11:13
+ * @LastEditTime: 2019-12-12 17:21:28
  -->
 <template>
   <el-container class="container">
@@ -55,7 +55,7 @@
                     <el-option v-for="item in templateOptions"
                                :key="item.value"
                                :label="item.label"
-                               :value="item.value">
+                               :value="item.path">
                     </el-option>
                   </el-select>
                 </el-form-item>
@@ -72,23 +72,40 @@
                   </el-select>
                 </el-form-item>
               </el-col>
-              <el-col :span="6"
-                      v-if="dateValue != 'sw'">
+              <el-col :span="6">
                 <el-form-item label="接口地址">
                   <el-input v-model="url"></el-input>
                 </el-form-item>
               </el-col>
               <el-col :span="6">
-                <el-button type="primary"
-                           @click="showSwaggerList"
-                           v-if="dateValue == 'sw'">
-                  批量选择
-                </el-button>
-                <el-button type="primary"
-                           @click="getSwagger"
-                           v-if="dateValue != 'sw'">
-                  全部生成
-                </el-button>
+                <el-row type='flex'
+                        :gutter="10">
+                  <el-button type="primary"
+                             @click="showSwaggerList">
+                    批量选择
+                  </el-button>
+                  <!-- <el-button type="primary"
+                            @click="getSwagger"
+                            v-if="dateValue != 'sw'">
+                    全部生成
+                  </el-button> -->
+                  <el-upload style='margin-left:10px'
+                             class="upload-demo"
+                             action="/api/upload"
+                             :show-file-list="false"
+                             :on-success="handleAvatarSuccess"
+                             multiple
+                             :limit="3"
+                             accept=".js,.ts,.java,.go,.py"
+                             :file-list="fileList">
+                    <el-button type="primary">上传模板</el-button>
+                  </el-upload>
+                  <el-button type="primary"
+                             style='margin-left:10px'
+                             @click="downLoadTemplate">
+                    下载模板
+                  </el-button>
+                </el-row>
               </el-col>
             </el-form>
           </el-row>
@@ -167,7 +184,9 @@ import {
   getCatalogue,
   getCatalogueList,
   getSwaggerAction,
-  generateTs
+  generateTs,
+  getTemplate,
+  downLoad
 } from '../../api/api'
 export default {
   // import引入的组件需要注入到对象中才能使用
@@ -175,6 +194,7 @@ export default {
   data () {
     // 这里存放数据
     return {
+      fileList: [],
       selectList: [],
       dialogVisible: false,
       transferValue: [],
@@ -186,31 +206,32 @@ export default {
       path: '',
       form: {},
       search: '',
-      templateValue: 'ts',
+      templateValue: '',
       dateValue: 'sw',
       templateSting: '',
-      templateOptions: [
-        {
-          value: 'ts',
-          label: 'TypeScript'
-        },
-        {
-          value: 'java',
-          label: 'Java'
-        },
-        {
-          value: 'go',
-          label: 'Go'
-        },
-        {
-          value: 'python',
-          label: 'Python'
-        },
-        {
-          value: 'self',
-          label: '自定义模板'
-        }
-      ],
+      templateOptions: [],
+      // templateOptions: [
+      //   {
+      //     value: 'ts',
+      //     label: 'TypeScript'
+      //   },
+      //   {
+      //     value: 'java',
+      //     label: 'Java'
+      //   },
+      //   {
+      //     value: 'go',
+      //     label: 'Go'
+      //   },
+      //   {
+      //     value: 'python',
+      //     label: 'Python'
+      //   },
+      //   {
+      //     value: 'self',
+      //     label: '自定义模板'
+      //   }
+      // ],
       dateOptions: [
         {
           value: 'sw',
@@ -250,6 +271,14 @@ export default {
   },
   // 方法集合
   methods: {
+    handleAvatarSuccess () {
+      this.$message({
+        message: '模板上传成功',
+        type: 'success'
+      })
+      this.getTemplateList()
+      return null
+    },
     handleSelectionChange (value) {
       if (this.flag) {
         this.selectList = value
@@ -274,15 +303,13 @@ export default {
       var path = this.$refs.tree.getCurrentNode()
         ? this.$refs.tree.getCurrentNode().path
         : this.path
-      getSwaggerAction().then(res => {
-        generateTs({ swagger: this.selectList, path: path }).then(resThen => {
-          this.$message({
-            message: '恭喜你，模板创建成功',
-            type: 'success'
-          })
-          this.templateSting = resThen
-          this.dialogVisible = false
+      generateTs({ swagger: this.selectList, path: path, templateUrl: this.templateValue }).then(resThen => {
+        this.$message({
+          message: '恭喜你，模板创建成功',
+          type: 'success'
         })
+        this.templateSting = resThen
+        this.dialogVisible = false
       })
     },
     /**
@@ -294,9 +321,16 @@ export default {
      * @example: 示例
      */
     showSwaggerList () {
+      if (!this.url) {
+        this.$message({
+          type: 'warning',
+          message: '请输入请求的url地址'
+        })
+        return null
+      }
       this.dialogVisible = true
       this.transferData = []
-      getSwaggerAction().then(res => {
+      getSwaggerAction({ url: this.url }).then(res => {
         // this.transferData = res.paths
         let paths = res.paths
 
@@ -334,6 +368,40 @@ export default {
         })
       })
     },
+    /**
+     * @author: 吴文周
+     * @name: getTemplateList
+     * @description: 获取模板列表
+     * @param {type}: 默认参数
+     * @return {type}: 默认类型
+     * @example: 示例
+     */
+    getTemplateList () {
+      getTemplate().then(res => {
+        this.templateOptions = res
+        this.templateValue = res[0]['path']
+      })
+    },
+    /**
+     * @author: 吴文周
+     * @name: downLoadTemplate
+     * @description: 下载模板
+     * @param {type}: 默认参数
+     * @return {type}: 默认类型
+     * @example: 示例
+     */
+    downLoadTemplate () {
+      downLoad({ path: this.templateValue }).then(res => {
+        let url = window.URL.createObjectURL(new Blob([res]))
+        let name = this.templateValue.split('\\').pop()
+        let link = document.createElement('a')
+        link.style.display = 'none'
+        link.href = url
+        link.setAttribute('download', name)
+        document.body.appendChild(link)
+        link.click()
+      })
+    },
     queryList (index) {
       let array = []
       this.list.forEach((element, i) => {
@@ -349,8 +417,6 @@ export default {
       })
     },
     loadNode (node, resolve) {
-      // var path = node.data.path.split.split('\\')
-      // path = path.join('\\')
       if (node.level === 0) {
         resolve([])
         return
@@ -366,8 +432,6 @@ export default {
       var path = this.$refs.tree.getCurrentNode()
         ? this.$refs.tree.getCurrentNode().path
         : this.path
-      // var specUrl = 'http://petstore.swagger.io/v2/swagger.json' // data urls are OK too 'data:application/json;base64,abc...'
-      // var specUrl = 'http://172.23.0.187:8186/v2/api-docs'
       getSwaggerAction().then(res => {
         generateTs({ swagger: res, path: path }).then(resThen => {
           this.$message({
@@ -377,25 +441,12 @@ export default {
           this.templateSting = resThen
         })
       })
-      // SwaggerClient.http.withCredentials = false // this activates CORS, if necessary
-
-      // var swaggerClient = new SwaggerClient(specUrl)
-      //   .then(function (swaggerClient) {
-      //     return swaggerClient.apis.pet.addPet({ id: 1, name: 'bobby' }) // chaining promises
-      //   }, function (reason) {
-      //     console.error('failed to load the spec' + reason)
-      //   })
-      //   .then(function (addPetResult) {
-      //     console.log(addPetResult.obj)
-      //     // you may return more promises, if necessary
-      //   }, function (reason) {
-      //     console.error('failed on API call ' + reason)
-      //   })
     }
   },
   // 生命周期 - 创建完成（可以访问当前this实例）
   created () {
     this.getCatalogueAction()
+    this.getTemplateList()
   },
   // 生命周期 - 挂载完成（可以访问DOM元素）
   mounted () { },

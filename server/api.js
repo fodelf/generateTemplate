@@ -4,11 +4,12 @@
  * @Github: http://gitlab.yzf.net/wuwenzhou
  * @Date: 2019-11-18 08:40:40
  * @LastEditors: 吴文周
- * @LastEditTime: 2019-11-26 16:29:20
+ * @LastEditTime: 2019-12-12 17:44:09
  */
 const bodyParser = require('body-parser')
 const folders = require('./folders')
 const fs = require('fs-extra')
+const f = require('fs')
 const mutipart = require('connect-multiparty')
 const mutipartMiddeware = mutipart()
 const proxy = require('http-proxy-middleware')
@@ -16,7 +17,9 @@ const _ = require('lodash')
 const path = require('path')
 const prettierTslint = require('prettier-tslint')
 const isPlatformWindows = process.platform.indexOf('win') === 0
-// const isPlatformWindows = process.platform.indexOf('win') === 0
+function resolve (dir) {
+  return path.join(__dirname, dir)
+}
 /**
  * @name: getCatalogue
  * @description: 获取当前目录
@@ -26,9 +29,51 @@ const isPlatformWindows = process.platform.indexOf('win') === 0
 function getCatalogue (app) {
   app.post('/api/getCatalogue', (req, res) => {
     let currget = folders.getCurrent()
-    console.log('ssss')
-    console.log({ 'data': currget })
     res.json({ 'data': currget })
+  })
+}
+/**
+ * @name: getTemplate
+ * @description: 获取当前目录
+ * @param {type}: 默认参数
+ * @return {type}: 默认类型
+ */
+function getTemplate (app) {
+  app.post('/api/getTemplate', (req, res) => {
+    let path = resolve('template')
+    folders.fileList(path).then((data) => {
+      res.json({ 'data': data })
+    }).catch(() => {
+      res.json({ 'data': [] })
+    })
+  })
+}
+/**
+ * @name: download
+ * @description: 下载
+ * @param {type}: 默认参数
+ * @return {type}: 默认类型
+ */
+function download (app) {
+  app.post('/api/downLoad', function (req, res) {
+    let path = req.body.path
+    let name = path.split('\\').pop()
+    console.log(name)
+    // res.download(path)
+    let size = fs.statSync(path).size
+    res.writeHead(200, {
+      'Content-Type': 'application/octet-stream',
+      // 'Access-Control-Expose-Headers':'Content-Disposition',
+      'Content-Disposition': 'attachment; filename=' + encodeURI(name),
+      'Content-Length': size
+    })
+    let readStream = f.createReadStream(path)// 得到文件输入流
+    readStream.on('data', (chunk) => {
+      res.write(chunk, 'binary')// 文档内容以二进制的格式写到response的输出流
+    })
+    readStream.on('end', () => {
+      res.end()
+    })
   })
 }
 /**
@@ -40,7 +85,6 @@ function getCatalogue (app) {
 function getList (app) {
   app.post('/api/getCatalogueList', (req, res) => {
     let base = req.body.path
-    console.log(base)
     folders.list(base).then((data) => {
       res.json({ 'data': data })
     }).catch(() => {
@@ -50,25 +94,18 @@ function getList (app) {
 }
 
 /**
- * @name: getList
- * @description: 获取文件列表
+ * @name: upload
+ * @description: 上传文件模板
  * @param {type}: 默认参数
  * @return {type}: 默认类型
  */
 function upload (app) {
   app.post('/api/upload', mutipartMiddeware, function (req, res) {
     const file = req.files.file
-    console.log(file)
     fs.readFile(file.path, 'utf8', function (err, data) {
       console.log(err)
       let outPath = folders.getCurrent().path + '/server/template/' + file.originalFilename
-      console.log(outPath)
       fs.outputFile(outPath, data, function () {
-        try {
-          prettierTslint.fix(outPath)
-        } catch (error) {
-          console.log(error)
-        }
         res.json({ data: '' })
       })
     })
@@ -78,11 +115,12 @@ function upload (app) {
 function generateTs (app) {
   app.post('/api/generateTs', function (req, res) {
     let swagger = req.body.swagger
-    // let outPath = path.join(__dirname, './template/interfaces1.ts')
-    let outPath = isPlatformWindows ? (req.body.path + '\\interfaces.ts') : (req.body.path + '/interfaces.ts')
+    let tempUrl = req.body.templateUrl
+    let name = tempUrl.split('\\').pop()
+    let outPath = isPlatformWindows ? (req.body.path + '\\' + name) : (req.body.path + '/' + name)
     // 读取模板文件，并修改内容
     let templateString = fs.readFileSync(
-      path.join(__dirname, './template/interfaces.ts'),
+      tempUrl,
       'utf8'
     )
     let swaggerList = []
@@ -108,39 +146,15 @@ function generateTs (app) {
         swaggerList.push(child)
       }
     }
-    // let pathObject = swagger.paths
-    // let includesAny = ['file']
-    // for (var k in pathObject) {
-    //   if (pathObject[k].post) {
-    //     let post = pathObject[k].post
-    //     let arry = post.parameters
-    //     if (Array.isArray(arry)) {
-    //       let child = {}
-    //       arry.map(item => {
-    //         if (item.type === 'integer') {
-    //           item.type = 'number'
-    //         } else if (item.type === 'array') {
-    //           // item.type = 'Array&lt;any&gt;'
-    //           item.type = 'any'
-    //         } else if (includesAny.includes(item.type) || !item.type) {
-    //           item.type = 'any'
-    //         }
-    //         return item
-    //       })
-    //       child['parameters'] = arry
-    //       child['ClassName'] = post.operationId.replace(post.operationId[0], post.operationId[0].toUpperCase())
-    //       child['desc'] = post.summary
-    //       swaggerList.push(child)
-    //     }
-    //   }
-    // }
     var compiled = _.template(templateString)
     let content = compiled({
       attrs: swaggerList
     })
     console.log(outPath)
     fs.outputFile(outPath, content, function () {
-      prettierTslint.fix(outPath)
+      if (outPath.includes('ts')) {
+        prettierTslint.fix(outPath)
+      }
       let templateString1 = fs.readFileSync(outPath, 'utf8')
       res.json({ data: templateString1 })
     })
@@ -154,11 +168,13 @@ function API (app) {
   getList(app)
   upload(app)
   generateTs(app)
+  getTemplate(app)
+  download(app)
   var options = {
-    target: 'http://172.23.0.187:8186/'
+    target: ''
   }
   var exampleProxy = proxy(options)
-  app.use('/v2/api-docs', exampleProxy)
+  app.use('', exampleProxy)
 }
 
 module.exports = API

@@ -22,7 +22,29 @@ function isDirectory (file) {
   }
   return false
 }
-
+async function fileList (base, context) {
+  let dir = base
+  if (isPlatformWindows) {
+    if (base.match(/^([A-Z]{1}:)$/)) {
+      dir = path.join(base, '\\')
+    }
+  }
+  const files = await fs.readdir(dir, 'utf8')
+  return files.map(
+    file => {
+      const folderPath = path.join(base, file)
+      return {
+        path: folderPath,
+        name: file,
+        label: file,
+        id: file,
+        children: [],
+        hidden: isHidden(folderPath),
+        isDirectory: isDirectory(folderPath)
+      }
+    }
+  )
+}
 async function list (base, context) {
   let dir = base
   if (isPlatformWindows) {
@@ -198,6 +220,7 @@ module.exports = {
   isDirectory,
   getCurrent,
   list,
+  fileList,
   open,
   openParent,
   isPackage,

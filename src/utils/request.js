@@ -4,7 +4,7 @@
  * @Github: https://github.com/fodelf
  * @Date: 2019-08-14 19:09:48
  * @LastEditors: 吴文周
- * @LastEditTime: 2019-11-25 10:19:08
+ * @LastEditTime: 2019-12-12 16:38:07
  */
 import axios from 'axios'
 import { Message } from 'element-ui'
@@ -117,6 +117,17 @@ export default function request (args) {
           res => {
             let data = res.data ? res.data : {}
             resolve(data)
+          },
+          err => {
+            reject(err)
+          }
+        )
+      })
+    case 'DownLoad':
+      return new Promise((resolve, reject) => {
+        axios.post(url, resParams, { responseType: 'arraybuffer' }).then(
+          res => {
+            resolve(res)
           },
           err => {
             reject(err)
